@@ -5,3 +5,11 @@ logging:
   level:
     root: INFO
     ru.aasmc: DEBUG
+
+---
+spring:
+  config:
+    activate:
+      on-profile: docker
+server:
+  port: 8080
