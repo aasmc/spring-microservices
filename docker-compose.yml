@@ -11,6 +11,9 @@ services:
           memory: 512m
         reservations:
           memory: 512m
+    depends_on:
+      mongodb:
+        condition: service_healthy
 
   recommendation:
     build: microservices/recommendation-service
@@ -22,6 +25,9 @@ services:
           memory: 512m
         reservations:
           memory: 512m
+    depends_on:
+      mongodb:
+        condition: service_healthy
 
   review:
     build: microservices/review-service
@@ -33,6 +39,9 @@ services:
           memory: 512m
         reservations:
           memory: 512m
+    depends_on:
+      mysql:
+        condition: service_healthy
 
   product-composite:
     build: microservices/product-composite-service
@@ -46,3 +55,41 @@ services:
           memory: 512m
         reservations:
           memory: 512m
+
+  mongodb:
+    image: mongo:4.4.2
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+        reservations:
+          memory: 512m
+    ports:
+      - "27017:27017"
+    command: mongod
+    healthcheck:
+      test: "mongo --eval 'db.stats().ok'"
+      interval: 5s
+      timeout: 2s
+      retries: 60
+
+  mysql:
+    image: mysql:5.7.32
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+        reservations:
+          memory: 512m
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=rootpwd
+      - MYSQL_DATABASE=review-db
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=pwd
+    healthcheck:
+      test: "/usr/bin/mysql --user=user --password=pwd --execute \"SHOW DATABASES;\""
+      interval: 5s
+      timeout: 2s
+      retries: 60

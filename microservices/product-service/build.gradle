@@ -21,6 +21,10 @@ configurations {
 	}
 }
 
+ext {
+	mapstructVersion = "1.5.5.Final"
+}
+
 repositories {
 	mavenCentral()
 }
@@ -30,8 +34,19 @@ dependencies {
 	implementation project(':util')
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+	compileOnly "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 	compileOnly 'org.projectlombok:lombok'
+	implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+	annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+	annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+	testAnnotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+
 	annotationProcessor 'org.projectlombok:lombok'
+	implementation platform('org.testcontainers:testcontainers-bom:1.18.3')
+	testImplementation 'org.testcontainers:testcontainers'
+	testImplementation 'org.testcontainers:junit-jupiter'
+	testImplementation 'org.testcontainers:mongodb'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'io.projectreactor:reactor-test'
 }

@@ -7,14 +7,24 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import ru.aasmc.api.exceptions.BadRequestException;
 import ru.aasmc.api.exceptions.InvalidInputException;
 import ru.aasmc.api.exceptions.NotFoundException;
 
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.UNPROCESSABLE_ENTITY;
 
 @Slf4j
 @RestControllerAdvice
 public class GlobalControllerExceptionHandler {
+
+    @ResponseStatus(BAD_REQUEST)
+    @ExceptionHandler(BadRequestException.class)
+    public @ResponseBody HttpErrorInfo handleBadRequestExceptions(
+            ServerHttpRequest request, BadRequestException ex) {
+
+        return createHttpErrorInfo(BAD_REQUEST, request, ex);
+    }
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(NotFoundException.class)

@@ -6,11 +6,26 @@ logging:
   level:
     root: INFO
     ru.aasmc: DEBUG
+    org.hibernate.sql: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+spring:
+  jpa:
+    hibernate:
+      ddl-auto: update
+  datasource:
+    url: jdbc:mysql://localhost/review-db
+    username: user
+    password: pwd
+    hikari:
+      initialization-fail-timeout: 60000
 
 ---
 spring:
   config:
     activate:
       on-profile: docker
+  datasource:
+    url: jdbc:mysql://mysql/review-db
 server:
   port: 8080
