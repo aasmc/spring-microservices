@@ -4,7 +4,23 @@ services:
   product:
     build: microservices/product-service
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_PROFILES_ACTIVE=docker,streaming_partitioned,streaming_instance_0
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+        reservations:
+          memory: 512m
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  product-p1:
+    build: microservices/product-service
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker,streaming_partitioned,streaming_instance_1
     deploy:
       resources:
         limits:
@@ -20,7 +36,23 @@ services:
   recommendation:
     build: microservices/recommendation-service
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_PROFILES_ACTIVE=docker,streaming_partitioned,streaming_instance_0
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+        reservations:
+          memory: 512m
+    depends_on:
+      mongodb:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  recommendation-p1:
+    build: microservices/recommendation-service
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker,streaming_partitioned,streaming_instance_1
     deploy:
       resources:
         limits:
@@ -36,7 +68,23 @@ services:
   review:
     build: microservices/review-service
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_PROFILES_ACTIVE=docker,streaming_partitioned,streaming_instance_0
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+        reservations:
+          memory: 512m
+    depends_on:
+      mysql:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+
+  review-p1:
+    build: microservices/review-service
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker,streaming_partitioned,streaming_instance_1
     deploy:
       resources:
         limits:
@@ -52,7 +100,7 @@ services:
   product-composite:
     build: microservices/product-composite-service
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_PROFILES_ACTIVE=docker,streaming_partitioned
     ports:
       - "8080:8080"
     deploy:

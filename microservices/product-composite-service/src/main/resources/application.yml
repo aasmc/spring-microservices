@@ -80,16 +80,62 @@ app:
     host: localhost
     port: 7003
 
+spring:
+  cloud:
+    stream:
+      default-binder: rabbit
+      default.contentType: application/json
+      bindings:
+        products-out-0:
+          destination: products
+          producer:
+            required-groups: auditGroup
+        recommendations-out-0:
+          destination: recommendations
+          producer:
+            required-groups: auditGroup
+        reviews-out-0:
+          destination: reviews
+          producer:
+            required-groups: auditGroup
+
+      kafka:
+        binder:
+          brokers: 127.0.0.1
+          defaultBrokerPort: 9092
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    stream:
+      username: guest
+      password: guest
+
 logging:
   level:
     root: INFO
     ru.aasmc: DEBUG
+
+management:
+  endpoint:
+    health:
+      show-details: ALWAYS
+  endpoints:
+    web:
+      exposure:
+        include: "*"
 
 ---
 spring:
   config:
     activate:
       on-profile: docker
+  rabbitmq:
+    host: rabbitmq
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: kafka
 server:
   port: 8080
 
@@ -103,4 +149,45 @@ app:
   review-service:
     host: review
     port: 8080
+
+---
+spring:
+  config:
+    activate:
+      on-profile: streaming_partitioned
+  cloud:
+    stream:
+      bindings:
+        products-out-0:
+          producer:
+            partition-key-expression: headers['partitionKey']
+            partition-count: 2
+        reviews-out-0:
+          producer:
+            partition-key-expression: headers['partitionKey']
+            partition-count: 2
+        recommendations-out-0:
+          producer:
+            partition-key-expression: headers['partitionKey']
+            partition-count: 2
+
+---
+spring:
+  config:
+    activate:
+      on-profile: kafka
+  cloud:
+    stream:
+      default-binder: kafka
+      kafka:
+        binder:
+          replication-factor: 1
+  kafka:
+    bootstrap-servers: kafka:9092
+
+
+management:
+  health:
+    rabbit:
+      enabled: false
 

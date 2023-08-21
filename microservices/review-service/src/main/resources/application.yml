@@ -19,6 +19,47 @@ spring:
     password: pwd
     hikari:
       initialization-fail-timeout: 60000
+  cloud:
+    stream:
+      default-binder: rabbit
+      default.contentType: application/json
+      bindings:
+        messageProcessor-in-0:
+          destination: reviews
+          group: reviewsGroup
+          consumer:
+            max-attempts: 3
+            back-off-initial-interval: 500
+            back-off-max-interval: 1000
+            back-off-multiplier: 2.0
+      rabbit:
+        bindings:
+          messageProcessor-in-0:
+            consumer:
+              auto-bind-dlq: true
+              republish-to-dlq: true
+      kafka:
+        bindings:
+          messageProcessor-in-0:
+            consumer:
+              enable-dlq: true
+        binder:
+          brokers: 127.0.0.1
+          defaultBrokerPort: 9092
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+
+management:
+  endpoint:
+    health:
+      show-details: always
+  endpoints:
+    web:
+      exposure:
+        include: "*"
 
 ---
 spring:
@@ -27,5 +68,65 @@ spring:
       on-profile: docker
   datasource:
     url: jdbc:mysql://mysql/review-db
+  rabbitmq:
+    host: rabbitmq
+  cloud:
+    stream:
+      kafka:
+        binder:
+          brokers: kafka
 server:
   port: 8080
+
+---
+spring:
+  config:
+    activate:
+      on-profile: streaming_partitioned
+  cloud:
+    stream:
+      bindings:
+        messageProcessor-in-0:
+          consumer:
+            partitioned: true
+            instance-count: 2
+---
+spring:
+  config:
+    activate:
+      on-profile: streaming_instance_0
+  cloud:
+    stream:
+      bindings:
+        messageProcessor-in-0:
+          consumer:
+            instance-index: 0
+---
+spring:
+  config:
+    activate:
+      on-profile: streaming_instance_1
+  cloud:
+    stream:
+      bindings:
+        messageProcessor-in-0:
+          consumer:
+            instance-index: 1
+---
+spring:
+  config:
+    activate:
+      on-profile: kafka
+  cloud:
+    stream:
+      default-binder: kafka
+      kafka:
+        binder:
+          replication-factor: 1
+  kafka:
+    bootstrap-servers: kafka:9092
+
+management:
+  health:
+    rabbit:
+      enabled: false

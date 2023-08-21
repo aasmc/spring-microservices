@@ -3,6 +3,7 @@ package ru.aasmc.microservices.core.product.persistence;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.mongodb.core.index.Indexed;
@@ -12,6 +13,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @NoArgsConstructor
 @Getter
 @Setter
+@ToString
 public class ProductEntity {
     @Id
     private String id;
