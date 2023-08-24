@@ -69,18 +69,21 @@ server:
   error:
     include-message: always
 
-app:
-  product-service:
-    host: localhost
-    port: 7001
-  recommendation-service:
-    host: localhost
-    port: 7002
-  review-service:
-    host: localhost
-    port: 7003
+app.eureka-server: localhost
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://${app.eureka-server}:8761/eureka/
+    initialInstanceInfoReplicationIntervalSeconds: 5
+    registryFetchIntervalSeconds: 5
+  instance:
+    leaseRenewalIntervalInSeconds: 5
+    leaseExpirationDurationInSeconds: 5
 
 spring:
+  application:
+    name: product-composite
   cloud:
     stream:
       default-binder: rabbit
@@ -136,6 +139,9 @@ spring:
       kafka:
         binder:
           brokers: kafka
+
+app.eureka-server: eureka
+
 server:
   port: 8080
 

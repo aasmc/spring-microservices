@@ -9,7 +9,21 @@ logging:
     org.hibernate.sql: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
 
+app.eureka-server: localhost
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://${app.eureka-server}:8761/eureka/
+    initialInstanceInfoReplicationIntervalSeconds: 5
+    registryFetchIntervalSeconds: 5
+  instance:
+    leaseRenewalIntervalInSeconds: 5
+    leaseExpirationDurationInSeconds: 5
+
 spring:
+  application:
+    name: review
   jpa:
     hibernate:
       ddl-auto: update
@@ -75,6 +89,9 @@ spring:
       kafka:
         binder:
           brokers: kafka
+
+app.eureka-server: eureka
+
 server:
   port: 8080
 

@@ -21,7 +21,10 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static ru.aasmc.api.event.Event.Type.CREATE;
 import static ru.aasmc.api.event.Event.Type.DELETE;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(
+        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        properties = {"eureka.client.enabled=false"}
+)
 @AutoConfigureWebTestClient(timeout = "36000")
 class ProductServiceApplicationTests extends MongoDbTestBase {
 

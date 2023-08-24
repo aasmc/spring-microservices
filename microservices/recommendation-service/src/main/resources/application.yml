@@ -1,7 +1,21 @@
 server.port: 7002
 server.error.include-message: always
 
+app.eureka-server: localhost
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://${app.eureka-server}:8761/eureka/
+    initial-instance-info-replication-interval-seconds: 5
+    registry-fetch-interval-seconds: 5
+  instance:
+    lease-renewal-interval-in-seconds: 5
+    lease-expiration-duration-in-seconds: 5
+
 spring:
+  application:
+    name: recommendation
   data:
     mongodb:
       host: localhost
@@ -70,6 +84,8 @@ spring:
       kafka:
         binder:
           brokers: kafka
+
+app.eureka-server: eureka
 
 server:
   port: 8080

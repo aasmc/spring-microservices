@@ -29,7 +29,8 @@ import static ru.aasmc.api.event.Event.Type.DELETE;
         webEnvironment = RANDOM_PORT,
         properties = {
                 "spring.cloud.stream.default-binder=rabbit",
-                "logging.level.ru.aasmc=DEBUG"
+                "logging.level.ru.aasmc=DEBUG",
+                "eureka.client.enabled=false"
         }
 )
 @AutoConfigureWebTestClient(timeout = "30000")

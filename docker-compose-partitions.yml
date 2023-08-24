@@ -167,3 +167,14 @@ services:
           memory: 512m
         reservations:
           memory: 512m
+
+  eureka:
+    build: spring-cloud/eureka-server
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+        reservations:
+          memory: 512m
+    ports:
+      - "8761:8761"
