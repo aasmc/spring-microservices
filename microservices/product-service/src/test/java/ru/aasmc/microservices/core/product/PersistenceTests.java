@@ -3,7 +3,6 @@ package ru.aasmc.microservices.core.product;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.mongo.embedded.EmbeddedMongoAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.data.mongo.DataMongoTest;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -11,7 +10,7 @@ import reactor.test.StepVerifier;
 import ru.aasmc.microservices.core.product.persistence.ProductEntity;
 import ru.aasmc.microservices.core.product.persistence.ProductRepository;
 
-@DataMongoTest(excludeAutoConfiguration = EmbeddedMongoAutoConfiguration.class)
+@DataMongoTest
 public class PersistenceTests extends MongoDbTestBase {
 
     @Autowired

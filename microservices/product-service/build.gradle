@@ -1,7 +1,7 @@
 plugins {
+	id 'org.springframework.boot' version '3.0.4'
+	id 'io.spring.dependency-management' version '1.1.0'
 	id 'java'
-	id 'org.springframework.boot' version '2.7.14'
-	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
 }
 
 group = 'ru.aasmc.microservices.core.product'
@@ -23,7 +23,7 @@ configurations {
 
 ext {
 	mapstructVersion = "1.5.5.Final"
-	springCloudVersion = "2021.0.8"
+	springCloudVersion = "2022.0.1"
 }
 
 repositories {
