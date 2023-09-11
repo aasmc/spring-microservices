@@ -34,6 +34,8 @@ spring:
     hikari:
       initialization-fail-timeout: 60000
   cloud:
+    function:
+      definition: messageProcessor
     stream:
       default-binder: rabbit
       default.contentType: application/json

@@ -23,6 +23,8 @@ spring:
       database: recommendation-db
 
   cloud:
+    function:
+      definition: messageProcessor
     stream:
       default-binder: rabbit
       default.contentType: application/json
