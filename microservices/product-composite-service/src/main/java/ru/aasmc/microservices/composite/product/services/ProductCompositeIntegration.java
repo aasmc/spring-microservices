@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.cloud.stream.function.StreamBridge;
+import org.springframework.http.HttpStatus;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
@@ -27,6 +28,7 @@ import ru.aasmc.util.http.HttpErrorInfo;
 
 import java.io.IOException;
 import java.util.logging.Level;
+
 
 @Slf4j
 @Component
@@ -182,7 +184,7 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
         }
         WebClientResponseException wcre = (WebClientResponseException) ex;
 
-        switch (wcre.getStatusCode()) {
+        switch (HttpStatus.resolve(wcre.getStatusCode().value())) {
             case NOT_FOUND -> {
                 return new NotFoundException(getErrorMessage(wcre));
             }

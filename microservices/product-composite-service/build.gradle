@@ -1,7 +1,7 @@
 plugins {
+	id 'org.springframework.boot' version '3.0.4'
+	id 'io.spring.dependency-management' version '1.1.0'
 	id 'java'
-	id 'org.springframework.boot' version '2.7.14'
-	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
 }
 
 group = 'ru.aasmc.microservices.composite.product'
@@ -18,7 +18,7 @@ configurations {
 }
 
 ext {
-	set('springCloudVersion', "2021.0.8")
+	springCloudVersion = "2022.0.1"
 }
 
 jar {
@@ -36,13 +36,13 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 	implementation 'org.springframework.cloud:spring-cloud-starter-stream-rabbit'
 	implementation 'org.springframework.cloud:spring-cloud-starter-stream-kafka'
-	implementation 'org.springdoc:springdoc-openapi-webflux-ui:1.7.0'
+	implementation 'org.springdoc:springdoc-openapi-starter-webflux-ui:2.0.2'
 	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.cloud:spring-cloud-stream::test-binder'
+	testImplementation 'org.springframework.cloud:spring-cloud-stream-test-binder'
 	testImplementation 'io.projectreactor:reactor-test'
 }
 
