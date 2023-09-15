@@ -44,12 +44,12 @@ public class OpenApiConfig {
                         .contact(new Contact()
                                 .name(apiContactName)
                                 .url(apiContactUrl)
-                                .email(apiContactEmail)
-                        ).termsOfService(apiTermsOfService)
+                                .email(apiContactEmail))
+                        .termsOfService(apiTermsOfService)
                         .license(new License()
                                 .name(apiLicense)
-                                .url(apiLicenseUrl))
-                ).externalDocs(new ExternalDocumentation()
+                                .url(apiLicenseUrl)))
+                .externalDocs(new ExternalDocumentation()
                         .description(apiExternalDocDesc)
                         .url(apiExternalDocUrl));
     }
