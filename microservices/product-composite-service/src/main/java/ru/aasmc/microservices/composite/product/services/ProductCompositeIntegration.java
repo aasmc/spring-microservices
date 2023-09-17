@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.actuate.health.Health;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.http.HttpStatus;
 import org.springframework.messaging.Message;
@@ -144,29 +143,6 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
                         new Event<>(Event.Type.DELETE, productId, null)
                 ))
                 .subscribeOn(publishEventScheduler).then();
-    }
-
-    public Mono<Health> getProductHealth() {
-        return getHealth(PRODUCT_SERVICE_URL);
-    }
-
-    public Mono<Health> getRecommendationHealth() {
-        return getHealth(RECOMMENDATION_SERVICE_URL);
-    }
-
-    public Mono<Health> getReviewHealth() {
-        return getHealth(REVIEW_SERVICE_URL);
-    }
-
-    private Mono<Health> getHealth(String url) {
-        url += "/actuator/health";
-        log.debug("Will call the Health API on URL: {}", url);
-        return webClient.get().uri(url)
-                .retrieve()
-                .bodyToMono(String.class)
-                .map(s -> new Health.Builder().up().build())
-                .onErrorResume(ex -> Mono.just(new Health.Builder().down(ex).build()))
-                .log(log.getName(), Level.FINE);
     }
 
     private void sendMessage(String bindingName, Event<?, ?> event) {

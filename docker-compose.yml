@@ -53,8 +53,6 @@ services:
     build: microservices/product-composite-service
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-    ports:
-      - "8080:8080"
     deploy:
       resources:
         limits:
@@ -128,5 +126,16 @@ services:
           memory: 512m
         reservations:
           memory: 512m
+
+  gateway:
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    build: spring-cloud/gateway
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+        reservations:
+          memory: 512m
     ports:
-      - "8761:8761"
+      - "8080:8080"

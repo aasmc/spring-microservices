@@ -4,6 +4,7 @@ springdoc:
   packagesToScan: ru.aasmc.microservices.composite.product
   pathsToMatch: /**
 
+
 api:
 
   common:
@@ -113,6 +114,7 @@ logging:
 
 management.endpoint.health.show-details: "ALWAYS"
 management.endpoints.web.exposure.include: "*"
+server.forward-headers-strategy: framework
 ---
 spring.config.activate.on-profile: docker
 
