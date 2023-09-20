@@ -193,6 +193,8 @@ services:
   gateway:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
+      - SERVER_SSL_KEY_STORE=file:/keystore/edge-test.p12
+      - SERVER_SSL_KEY_STORE_PASSWORD=testtest
     build: spring-cloud/gateway
     deploy:
       resources:
@@ -201,4 +203,4 @@ services:
         reservations:
           memory: 512m
     ports:
-      - "8080:8080"
+      - "8443:8443"
