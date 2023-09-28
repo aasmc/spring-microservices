@@ -3,7 +3,7 @@ server:
   ssl:
     key-store-type: PKCS12
     key-store: classpath:keystore/edge.p12
-    key-password: password
+    key-store-password: password
     key-alias: localhost
 
 spring.application.name: gateway
@@ -31,10 +31,30 @@ spring.cloud.gateway.routes:
     predicates:
       - Path=/product-composite/**
 
+  - id: oauth2-server
+    uri: lb://auth-server
+    predicates:
+      - Path=/oauth2/**
+
+  - id: oauth2-login
+    uri: lb://auth-server
+    predicates:
+      - Path=/login/**
+
+  - id: oauth2-error
+    uri: lb://auth-server
+    predicates:
+      - Path=/error/**
+
   - id: product-composite-swagger-ui
     uri: lb://product-composite
     predicates:
       - Path=/openapi/**
+
+  - id: product-composite-swagger-ui-webjars
+    uri: lb://product-composite
+    predicates:
+      - Path=/webjars/**
 
   - id: eureka-api
     uri: http://${app.eureka-server}:8761
@@ -54,6 +74,8 @@ spring.cloud.gateway.routes:
     uri: http://${app.eureka-server}:8761
     predicates:
       - Path=/eureka/**
+
+spring.security.oauth2.resourceserver.jwt.issuer-uri: http://${app.auth-server}:9999
 
 management.endpoint.gateway.enabled: true
 management.endpoint.health.show-details: "ALWAYS"

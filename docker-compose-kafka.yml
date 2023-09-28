@@ -193,8 +193,6 @@ services:
   gateway:
     environment:
       - SPRING_PROFILES_ACTIVE=docker
-      - SERVER_SSL_KEY_STORE=file:/keystore/edge-test.p12
-      - SERVER_SSL_KEY_STORE_PASSWORD=testtest
     build: spring-cloud/gateway
     deploy:
       resources:
@@ -204,3 +202,19 @@ services:
           memory: 512m
     ports:
       - "8443:8443"
+
+  auth-server:
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    build: spring-cloud/authorization-server
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+        reservations:
+          memory: 512m
+    healthcheck:
+      test: [ "CMD", "curl", "-fs", "http://localhost:9999/actuator/health" ]
+      interval: 5s
+      timeout: 2s
+      retries: 60
