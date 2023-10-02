@@ -28,19 +28,20 @@ import static java.util.Collections.singletonList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.HttpStatus.ACCEPTED;
 import static ru.aasmc.api.event.Event.Type.*;
 import static ru.aasmc.microservices.composite.product.IsSameEvent.sameEventExceptCreatedAt;
 
 @SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        webEnvironment = RANDOM_PORT,
         classes = {TestSecurityConfig.class},
         properties = {
                 "spring.security.oauth2.resourceserver.jwt.issuer-uri=",
                 "spring.main.allow-bean-definition-overriding=true",
-                "eureka.client.enabled=false"
-        }
-)
+                "eureka.client.enabled=false",
+                "spring.cloud.stream.defaultBinder=rabbit",
+                "spring.cloud.config.enabled=false"})
 @Import({TestChannelBinderConfiguration.class})
 public class MessagingTests {
 

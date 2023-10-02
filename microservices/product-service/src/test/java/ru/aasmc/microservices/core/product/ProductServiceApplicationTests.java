@@ -16,15 +16,15 @@ import ru.aasmc.microservices.core.product.persistence.ProductRepository;
 import java.util.function.Consumer;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.RANDOM_PORT;
 import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static ru.aasmc.api.event.Event.Type.CREATE;
 import static ru.aasmc.api.event.Event.Type.DELETE;
 
-@SpringBootTest(
-        webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        properties = {"eureka.client.enabled=false"}
-)
+@SpringBootTest(webEnvironment = RANDOM_PORT, properties = {
+        "eureka.client.enabled=false",
+        "spring.cloud.config.enabled=false"})
 @AutoConfigureWebTestClient(timeout = "36000")
 class ProductServiceApplicationTests extends MongoDbTestBase {
 
