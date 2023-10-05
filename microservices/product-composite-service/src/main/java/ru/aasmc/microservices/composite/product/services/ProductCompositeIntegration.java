@@ -1,6 +1,10 @@
 package ru.aasmc.microservices.composite.product.services;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.github.resilience4j.circuitbreaker.CallNotPermittedException;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.retry.annotation.Retry;
+import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -11,6 +15,7 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Scheduler;
@@ -24,8 +29,10 @@ import ru.aasmc.api.event.Event;
 import ru.aasmc.api.exceptions.InvalidInputException;
 import ru.aasmc.api.exceptions.NotFoundException;
 import ru.aasmc.util.http.HttpErrorInfo;
+import ru.aasmc.util.http.ServiceUtil;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.logging.Level;
 
 
@@ -40,18 +47,21 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
     private final WebClient webClient;
     private final StreamBridge streamBridge;
     private final Scheduler publishEventScheduler;
+    private final ServiceUtil serviceUtil;
 
     @Autowired
     public ProductCompositeIntegration(
             ObjectMapper mapper,
             @Qualifier("loadBalancedWebClientBuilder") WebClient.Builder builder,
             StreamBridge streamBridge,
-            @Qualifier("publishEventScheduler") Scheduler publishEventScheduler) {
+            @Qualifier("publishEventScheduler") Scheduler publishEventScheduler,
+            ServiceUtil serviceUtil) {
 
         this.mapper = mapper;
         this.webClient = builder.build();
         this.streamBridge = streamBridge;
         this.publishEventScheduler = publishEventScheduler;
+        this.serviceUtil = serviceUtil;
     }
 
     @Override
@@ -63,16 +73,35 @@ public class ProductCompositeIntegration implements ProductService, Recommendati
         }).subscribeOn(publishEventScheduler);
     }
 
+    @Retry(name = "product")
+    @TimeLimiter(name = "product")
+    @CircuitBreaker(name = "product", fallbackMethod = "getProductFallbackValue")
     @Override
-    public Mono<Product> getProduct(int productId) {
-        String url = PRODUCT_SERVICE_URL + "/product/" + productId;
+    public Mono<Product> getProduct(int productId, int delay, int faultPercent) {
+        URI url = UriComponentsBuilder.fromUriString(PRODUCT_SERVICE_URL +
+                        "/product/{productId}?delay={delay}&faultPercent={faultPercent}")
+                .build(productId, delay, faultPercent);
         log.debug("Will call the getProduct API on URL: {}", url);
-
         return webClient.get().uri(url)
                 .retrieve()
                 .bodyToMono(Product.class)
                 .log(log.getName(), Level.FINE)
                 .onErrorMap(WebClientResponseException.class, this::handleException);
+    }
+
+    private Mono<Product> getProductFallbackValue(int productId,
+                                                  int delay,
+                                                  int faultPercent,
+                                                  CallNotPermittedException ex) {
+        log.warn("Creating a fail-fast fallback product for productId = {}, delay = {}, faultPercent = {}, exception = {}",
+                productId, delay, faultPercent, ex.toString());
+        if (productId == 13) {
+            String errMsg = "Product Id: " + productId + " not found in fallback cache!";
+            log.warn(errMsg);
+            throw new NotFoundException(errMsg);
+        }
+
+        return Mono.just(new Product(productId, "Fallback product" + productId, productId, serviceUtil.getServiceAddress()));
     }
 
     @Override

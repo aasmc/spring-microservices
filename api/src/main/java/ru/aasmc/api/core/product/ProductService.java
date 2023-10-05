@@ -19,7 +19,11 @@ public interface ProductService {
             value = "/product/{productId}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    Mono<Product> getProduct(@PathVariable("productId") int productId);
+    Mono<Product> getProduct(
+            @PathVariable("productId") int productId,
+            @RequestParam(value = "delay", required = false, defaultValue = "0") int delay,
+            @RequestParam(value = "faultPercent", required = false, defaultValue = "0") int faultPercent
+    );
 
     Mono<Void> deleteProduct(int productId);
 

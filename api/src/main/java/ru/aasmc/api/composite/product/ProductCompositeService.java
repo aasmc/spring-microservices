@@ -55,7 +55,10 @@ public interface ProductCompositeService {
     @GetMapping(
             value = "/product-composite/{productId}",
             produces = MediaType.APPLICATION_JSON_VALUE)
-    Mono<ProductAggregate> getProduct(@PathVariable int productId);
+    Mono<ProductAggregate> getProduct(
+            @PathVariable int productId,
+            @RequestParam(value = "delay", required = false, defaultValue = "0") int delay,
+            @RequestParam(value = "faultPercent", required = false, defaultValue = "0") int faultPercent);
 
     /**
      * Sample usage: "curl -X DELETE $HOST:$PORT/product-composite/1".
