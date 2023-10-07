@@ -17,6 +17,7 @@ import org.springframework.data.mongodb.core.index.MongoPersistentEntityIndexRes
 import org.springframework.data.mongodb.core.index.ReactiveIndexOperations;
 import org.springframework.data.mongodb.core.mapping.MongoPersistentEntity;
 import org.springframework.data.mongodb.core.mapping.MongoPersistentProperty;
+import reactor.core.publisher.Hooks;
 import ru.aasmc.microservices.core.product.persistence.ProductEntity;
 
 @SpringBootApplication
@@ -25,6 +26,7 @@ import ru.aasmc.microservices.core.product.persistence.ProductEntity;
 public class ProductServiceApplication {
 
     public static void main(String[] args) {
+        Hooks.enableAutomaticContextPropagation();
         ConfigurableApplicationContext ctx = SpringApplication.run(ProductServiceApplication.class, args);
         String mongoDbHost = ctx.getEnvironment().getProperty("spring.data.mongodb.host");
         String mongoDbPort = ctx.getEnvironment().getProperty("spring.data.mongodb.port");

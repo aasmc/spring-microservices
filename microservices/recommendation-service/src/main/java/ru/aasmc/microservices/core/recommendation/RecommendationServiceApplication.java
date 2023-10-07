@@ -17,6 +17,7 @@ import org.springframework.data.mongodb.core.index.MongoPersistentEntityIndexRes
 import org.springframework.data.mongodb.core.index.ReactiveIndexOperations;
 import org.springframework.data.mongodb.core.mapping.MongoPersistentEntity;
 import org.springframework.data.mongodb.core.mapping.MongoPersistentProperty;
+import reactor.core.publisher.Hooks;
 import ru.aasmc.microservices.core.recommendation.persistence.RecommendationEntity;
 
 @SpringBootApplication
@@ -25,6 +26,7 @@ import ru.aasmc.microservices.core.recommendation.persistence.RecommendationEnti
 public class RecommendationServiceApplication {
 
 	public static void main(String[] args) {
+		Hooks.enableAutomaticContextPropagation();
 		ConfigurableApplicationContext ctx = SpringApplication.run(RecommendationServiceApplication.class, args);
 		String mongodDbHost = ctx.getEnvironment().getProperty("spring.data.mongodb.host");
 		String mongodDbPort = ctx.getEnvironment().getProperty("spring.data.mongodb.port");

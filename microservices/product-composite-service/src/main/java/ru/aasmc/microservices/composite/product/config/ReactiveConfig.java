@@ -2,8 +2,10 @@ package ru.aasmc.microservices.composite.product.config;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
+import org.springframework.cloud.client.loadbalancer.reactive.ReactorLoadBalancerExchangeFilterFunction;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -32,9 +34,11 @@ public class ReactiveConfig {
         return Schedulers.newBoundedElastic(threadPoolSize, taskQueueSize, "publish-pool");
     }
 
+    @Autowired
+    private ReactorLoadBalancerExchangeFilterFunction lbFunction;
+
     @Bean
-    @LoadBalanced
-    public WebClient.Builder loadBalancedWebClientBuilder() {
-        return WebClient.builder();
+    public WebClient webClient(WebClient.Builder builder) {
+        return builder.filter(lbFunction).build();
     }
 }
