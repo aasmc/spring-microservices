@@ -41,6 +41,8 @@ dependencies {
 	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 	implementation 'org.springframework.cloud:spring-cloud-starter-config'
 	implementation 'org.springframework.retry:spring-retry'
+	implementation 'io.micrometer:micrometer-tracing-bridge-otel'
+	implementation 'io.opentelemetry:opentelemetry-exporter-zipkin'
 
 	implementation "org.mapstruct:mapstruct:${mapstructVersion}"
 	annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
