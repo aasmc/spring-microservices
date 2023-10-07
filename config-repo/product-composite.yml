@@ -129,8 +129,8 @@ resilience4j.circuitbreaker:
 logging:
   level:
     root: INFO
-    ru.aasmc: DEBUG
-    org.springframework.web.server.adapter.HttpWebHandlerAdapter: TRACE
+    ru.aasmc: INFO
+    org.springframework.web.server.adapter.HttpWebHandlerAdapter: INFO
 
 ---
 spring.config.activate.on-profile: docker
