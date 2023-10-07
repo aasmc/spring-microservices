@@ -14,11 +14,13 @@ import ru.aasmc.api.core.product.Product;
 import ru.aasmc.api.core.recommendation.Recommendation;
 import ru.aasmc.api.core.review.Review;
 import ru.aasmc.api.exceptions.NotFoundException;
+import ru.aasmc.microservices.composite.product.tracing.ObservationUtil;
 import ru.aasmc.util.http.ServiceUtil;
 
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Supplier;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
@@ -29,10 +31,15 @@ public class ProductCompositeServiceImpl implements ProductCompositeService {
 
     private final ServiceUtil serviceUtil;
     private final ProductCompositeIntegration integration;
+    private final ObservationUtil observationUtil;
     private final SecurityContext nullSecCtx = new SecurityContextImpl();
 
     @Override
     public Mono<Void> createProduct(ProductAggregate body) {
+        return observationWithProductInfo(body.getProductId(), () -> createProductInternal(body));
+    }
+
+    private Mono<Void> createProductInternal(ProductAggregate body) {
         try {
             List<Mono<?>> monoList = new ArrayList<>();
             monoList.add(getLogAuthorizationInfoMono());
@@ -79,6 +86,10 @@ public class ProductCompositeServiceImpl implements ProductCompositeService {
 
     @Override
     public Mono<ProductAggregate> getProduct(int productId, int delay, int faultPercent) {
+        return observationWithProductInfo(productId, () -> getProductInternal(productId, delay, faultPercent));
+    }
+
+    private Mono<ProductAggregate> getProductInternal(int productId, int delay, int faultPercent) {
         log.debug("getCompositeProduct: lookup a product aggregate for productId: {}", productId);
         return Mono.zip(
                         values -> createProductAggregate(
@@ -98,6 +109,10 @@ public class ProductCompositeServiceImpl implements ProductCompositeService {
 
     @Override
     public Mono<Void> deleteProduct(int productId) {
+        return observationWithProductInfo(productId, () -> deleteProductInternal(productId));
+    }
+
+    private Mono<Void> deleteProductInternal(int productId) {
         try {
             log.debug("deleteCompositeProduct: Deletes a product aggregate for productId: {}", productId);
 
@@ -114,6 +129,16 @@ public class ProductCompositeServiceImpl implements ProductCompositeService {
             log.warn("deleteCompositeProduct failed: {}", re.toString());
             throw re;
         }
+    }
+
+    private <T> T observationWithProductInfo(int productInfo, Supplier<T> supplier) {
+        return observationUtil.observe(
+                "composite observation",
+                "product info",
+                "productId",
+                String.valueOf(productInfo),
+                supplier
+        );
     }
 
     private ProductAggregate createProductAggregate(SecurityContext sc,
