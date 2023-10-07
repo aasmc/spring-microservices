@@ -187,3 +187,17 @@ services:
       - SPRING_SECURITY_USER_PASSWORD=${CONFIG_SERVER_PWD}
     volumes:
       - $PWD/config-repo:/config-repo
+
+  zipkin-server:
+    image: openzipkin/zipkin:2.24.0
+    restart: always
+    deploy:
+      resources:
+        limits:
+          memory: 1024m
+        reservations:
+          memory: 1024m
+    environment:
+      - STORAGE_TYPE=mem
+    ports:
+      - 9411:9411
