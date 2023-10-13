@@ -1,3 +1,4 @@
+## Distribured Tracing
 1. Add dependencies to the build files to bring Micrometer Tracing with a tracer 
     implementation and a reporter. 
 
@@ -98,3 +99,47 @@ curl -X DELETE -H "Authorization: Bearer $ACCESS_TOKEN" -k https://
 localhost:8443/product-composite/12345 -w "%{http_code}\n" -o /dev/null
 -s
 ```
+
+## Deploy to Kubernetes
+
+Kubernetes comes with its own service discovery based on Kubernetes Service objects and 
+`kube-proxy`. This makes it unnecessary to use Netflix Eureka. 
+
+Apply the following changes:
+1. Netflix Eureka and the Spring Cloud LoadBalancer-specific configuration (client and server) have been removed from the configuration repository, config-repo.
+2. Routing rules in the gateway Service to the Eureka server have been removed from the config- repo/gateway.yml file.
+3. The Eureka server project, in the spring-cloud/eureka-server folder, has been removed.
+4. The Eureka server has been removed from the Docker Compose files and the settings.gradle Gradle file.
+5. The dependency on `spring-cloud-starter-netflix-eureka-client` has been removed in all of Eureka’s client build files, build.gradle.
+6. The property setting `eureka.client.enabled=false` has been removed from all integration tests of former Eureka clients.
+7. The gateway Service no longer uses routing based on the client-side load balancer in Spring Cloud LoadBalancer, using the lb protocol. For example, the lb://product-composite routing destination has been replaced with http://product-composite in the config-repo/gateway. yml file.
+8. The HTTP port used by the microservices and the authorization server has been changed from port 8080 (9999 in the case of the authorization server) to the default HTTP port, 80. This has been configured in config-repo for each affected Service, like so:
+```yaml
+spring.config.activate.on-profile: docker
+server.port: 80
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

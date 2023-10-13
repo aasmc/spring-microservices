@@ -28,7 +28,6 @@ import static ru.aasmc.api.event.Event.Type.DELETE;
 @SpringBootTest(webEnvironment = RANDOM_PORT, properties = {
         "spring.cloud.stream.defaultBinder=rabbit",
         "logging.level.ru.aasmc=DEBUG",
-        "eureka.client.enabled=false",
         "spring.jpa.hibernate.ddl-auto=update",
         "spring.cloud.config.enabled=false"})
 @AutoConfigureWebTestClient(timeout = "30000")

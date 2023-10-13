@@ -94,7 +94,7 @@ spring.cloud.stream:
       producer:
         required-groups: auditGroup
 
-spring.security.oauth2.resourceserver.jwt.issuer-uri: http://${app.auth-server}:9999
+spring.security.oauth2.resourceserver.jwt.issuer-uri: http://${app.auth-server}
 
 resilience4j.timelimiter:
   instances:
@@ -132,10 +132,14 @@ logging:
     ru.aasmc: INFO
     org.springframework.web.server.adapter.HttpWebHandlerAdapter: INFO
 
+# To see tracing headers, uncomment the following two lines and restart the product-composite service
+# spring.codec.log-request-details: true
+# logging.level.org.springframework.web.reactive.function.client.ExchangeFunctions: TRACE
+
 ---
 spring.config.activate.on-profile: docker
 
-server.port: 8080
+server.port: 80
 
 ---
 spring.config.activate.on-profile: streaming_partitioned
@@ -151,3 +155,12 @@ spring.cloud.stream.bindings.recommendations-out-0.producer:
 spring.cloud.stream.bindings.reviews-out-0.producer:
   partition-key-expression: headers['partitionKey']
   partition-count: 2
+
+---
+spring.config.activate.on-profile: prod
+
+logging:
+  level:
+    root: WARN
+    ru.aasmc: WARN
+    org.springframework.web.server.adapter.HttpWebHandlerAdapter: WARN

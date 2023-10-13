@@ -25,8 +25,8 @@ import static reactor.core.publisher.Mono.just;
 import static ru.aasmc.api.event.Event.Type.CREATE;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT, properties = {
-		"eureka.client.enabled=false",
-		"spring.cloud.config.enabled=false"})
+		"spring.cloud.config.enabled=false"
+})
 @AutoConfigureWebTestClient(timeout = "30000")
 class RecommendationServiceApplicationTests extends MongoDbTestBase {
 

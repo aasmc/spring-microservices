@@ -23,8 +23,8 @@ import static ru.aasmc.api.event.Event.Type.CREATE;
 import static ru.aasmc.api.event.Event.Type.DELETE;
 
 @SpringBootTest(webEnvironment = RANDOM_PORT, properties = {
-        "eureka.client.enabled=false",
-        "spring.cloud.config.enabled=false"})
+        "spring.cloud.config.enabled=false"
+})
 @AutoConfigureWebTestClient(timeout = "36000")
 class ProductServiceApplicationTests extends MongoDbTestBase {
 
