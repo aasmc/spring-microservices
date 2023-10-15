@@ -118,16 +118,125 @@ Apply the following changes:
 spring.config.activate.on-profile: docker
 server.port: 80
 ```
+9. To enable graceful shutdown, the following properties are added to the common application.yml
+```yaml
+server.shutdown: graceful
+spring.lifecycle.timeout-per-shutdown-phase: 10s
+```
+10. To enable liveness and readiness probes, the following configurations are added to the common application.yml:
+```yaml
+management.endpoint.health.probes.enabled: true
+management.endpoint.health.group.readiness.include: readinessState, rabbit, db, mongo
+```
+
+## Introducing Helm 
+Helm is a package manager for Kubernetes.
+A package is known as a **chart** in Helm. A chart contains templates, default values for the 
+templates, and optional dependencies on definitions on other charts. 
+To extract boilerplate definitions from the components' charts, a special type of chart,
+a **library chart** will be used. It doesn't contain any deployable definitions but only 
+templates expected to be used by other charts for Kubernetes manifests.
+Finally, to be able to describe how to deploy all components into different types of
+environments, for example, for development and testing or staging and production, the
+concept of parent charts and subcharts will be used. We will define two types of
+environments, dev-env and prod-env. Each environment will be implemented as a parent 
+chart that depends on different sets of subcharts, for example, the microservice charts. 
+The environment charts will also provide environment-specific default values, such as for
+the requested number of Pods, Docker image versions, credentials, and resource requests 
+and limits.
+
+### Running Helm Commands
+
+To make Helm do something for us, we will use its CLI tool, helm. Some of the most frequently used Helm commands are:
+
+- **create**: Used to create new charts.
+- **dependency update** (dep up for short): Resolves dependencies on other charts. Charts are placed in the charts folder and the file Chart.lock is updated.
+- **dependency build**: Rebuilds the dependencies based on the content in the file Chart.lock. 
+- **template**: Renders the definition files created by the templates.
+- **install**: Installs a chart. This command can override the values supplied by a chart, either using the --set flag to override a single value or using the --values flag to supply its own yaml file with values.
+- **install --Dry-run**: simulates a Deployment without performing it; it’s useful for verifying a Deployment before executing it.
+- **list**: Lists installations in the current n amespace. upgrade: Updates an existing installation.
+- **uninstall**: Removes an installation.
+
+### Looking into a Helm Chart
+
+A Helm chart has a predefined structure of files. We will use the following files:
+- **Chart.yaml**, which contains general information about the chart and a list of other charts it might depend on.
+- **templates**, a folder that contains the templates that will be used to deploy the chart.
+- **values.yaml**, which contains default values for the variables used by the templates.
+- **Chart.lock**, a file created by Helm when resolving the dependencies described in the Chart. yaml file. This information describes in more detail what dependencies are actually used. It is used by Helm to track the entire dependency tree, making it possible to recreate the depen- dency tree exactly as it looked the last time the chart worked.
+- **charts,** a folder that will contain the charts this chart depends on after Helm has resolved the dependencies.
+- **.helmignore**, an ignore file similar to .gitignore. It can be used to list files that should be excluded when building the chart.
 
 
+### Most frequently used Helm built-in objects:
 
+1. **Values**: Used to refer to values in the chart’s values.yaml file or values supplied when running a Helm command like install.
+2. **Release**: Used to provide metadata regarding the current release that is installed. It contains fields like:
+   1. **Name**: The name of the release
+   2. **Namespace**: The name of the namespace where the installation is performed
+   3. **Service**: The name of the installation Service, always returning Helm
+3. **Chart**: Used to access information from the Chart.yaml file. Examples of fields that can be useful for providing metadata for a Deployment are:
+   1. **Name**: The name of the chart
+   2. **Version**: The chart’s version number
+4. **Files**: Containing functions for accessing chart-specific files. In this chapter we will use the following two functions in the Files object:
+   1. **Glob**: Returns files in a chart based on a glob pattern. For example, the pattern "config- repo/*" will return all files found in the folder config-repo
+   2. **AsConfig**: Returns the content of files as a YAML map appropriate for declaring values in a ConfigMap
+5. **Capabilities**: Can be used to find information regarding the capabilities of the Kubernetes cluster that the installation is performed on. For example, a template can use information in this object to adopt a manifest based on what API versions the actual Kubernetes cluster supports. We will not use this object in this chapter, but I think it is in our interest to be aware of it for more advanced use cases.
 
+#### Example of using the ConfigMap template
+```bash
+cd kubernetes/helm/components/config-server
+helm dependency update .
+helm template . -s templates/configmap_from_file.yaml
+```
 
+#### Example of using the Secrets template:
+```bash
+cd kubernetes/helm
+for f in components/*; do helm dependency update $f; done
+helm dependency update environments/dev-env 
+helm template environments/dev-env -s templates/secrets.yaml
+```
 
+### Example of using the Service template
 
+```bash
+cd kubernetes/helm
+helm dependency update components/product
+helm template components/product -s templates/service.yaml
+```
+### Example of using the Deployment template
+```bash
+cd kubernetes/helm
+helm dependency update components/product
+helm template components/product -s templates/deployment.yaml
+```
 
+### Example of using the Deployment template for mongodb
+```bash
+cd kubernetes/helm
+helm dependency update components/mongodb
+helm template components/mongodb -s templates/deployment.yaml
+```
 
+#### Readiness and Liveness probes
 
+Finding optimal settings for the probes can be challenging, that is, finding a proper
+balance between getting a swift reaction from Kubernetes when the availability of a Pod
+changes and not overloading the Pods with probe requests.
+
+Specifically, configuring a liveness probe with values that are too low can result in
+Ku- bernetes restarting Pods that don’t need to be restarted; they just need some extra 
+time to start up. Starting a large number of Pods at the same time, also resulting in 
+extra-long startup times, can similarly result in a lot of unnecessary restarts.
+
+Setting the configuration values too high on the probes (except for the successThreshold 
+value) makes Kubernetes react more slowly, which can be annoying in a development 
+environment. Proper values also depend on the available hardware, which affects the 
+startup times for the Pods. For the scope of this book, failureThreshold for the 
+liveness probes is set to a high value, 20, to avoid unnecessary restarts on computers 
+with limited hardware resources.
 
 
 
