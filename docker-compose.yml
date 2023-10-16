@@ -3,6 +3,7 @@ version: '3.9'
 services:
   product:
     build: microservices/product-service
+    image: hands-on/product-service
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - CONFIG_SERVER_USR=${CONFIG_SERVER_USR}
@@ -21,6 +22,7 @@ services:
 
   recommendation:
     build: microservices/recommendation-service
+    image: hands-on/recommendation-service
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - CONFIG_SERVER_USR=${CONFIG_SERVER_USR}
@@ -39,6 +41,7 @@ services:
 
   review:
     build: microservices/review-service
+    image: hands-on/review-service
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - CONFIG_SERVER_USR=${CONFIG_SERVER_USR}
@@ -57,6 +60,7 @@ services:
 
   product-composite:
     build: microservices/product-composite-service
+    image: hands-on/product-composite-service
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - CONFIG_SERVER_USR=${CONFIG_SERVER_USR}
@@ -126,25 +130,13 @@ services:
         reservations:
           memory: 512m
 
-  eureka:
-    build: spring-cloud/eureka-server
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - CONFIG_SERVER_USR=${CONFIG_SERVER_USR}
-      - CONFIG_SERVER_PWD=${CONFIG_SERVER_PWD}
-    deploy:
-      resources:
-        limits:
-          memory: 512m
-        reservations:
-          memory: 512m
-
   gateway:
+    build: spring-cloud/gateway
+    image: hands-on/gateway
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - CONFIG_SERVER_USR=${CONFIG_SERVER_USR}
       - CONFIG_SERVER_PWD=${CONFIG_SERVER_PWD}
-    build: spring-cloud/gateway
     deploy:
       resources:
         limits:
@@ -155,11 +147,12 @@ services:
       - "8443:8443"
 
   auth-server:
+    build: spring-cloud/authorization-server
+    image: hands-on/auth-server
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - CONFIG_SERVER_USR=${CONFIG_SERVER_USR}
       - CONFIG_SERVER_PWD=${CONFIG_SERVER_PWD}
-    build: spring-cloud/authorization-server
     deploy:
       resources:
         limits:
@@ -174,6 +167,7 @@ services:
 
   config-server:
     build: spring-cloud/config-server
+    image: hands-on/config-server
     deploy:
       resources:
         limits:

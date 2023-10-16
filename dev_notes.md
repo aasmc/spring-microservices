@@ -248,6 +248,24 @@ cd kubernetes/helm/components/config-server
 ln -s ../../../../config-repo config-repo
 ```
 
+## Building Docker Images
+
+Normally, we have to push images to a Docker registry and configure Kubernetes to pull
+images from the registry. In our case, where we have a local single node cluster, we can
+shortcut this process by pointing our Docker client to the Docker engine in Minikube and
+then running the docker-compose build command. This will result in the Docker images being
+immediately available to Kubernetes. For development, we will use latest as the Docker 
+image version for the microservices.
+
+```bash
+./gradlew build
+eval $(minikube docker-env)
+docker-compose build
+```
+The eval $(minikube docker-env) command directs the local Docker client to communicate
+with the Docker engine in Minikube.
+
+
 
 
 
