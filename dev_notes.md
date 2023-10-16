@@ -238,8 +238,15 @@ startup times for the Pods. For the scope of this book, failureThreshold for the
 liveness probes is set to a high value, 20, to avoid unnecessary restarts on computers 
 with limited hardware resources.
 
+### Config Server soft link
 
-
+The template expects to find the property files in the charts folder, config-repo. 
+To avoid duplicating the config-repo from $config-repo, a soft link, also known as a 
+symbolic link, has been created with the command:
+```bash
+cd kubernetes/helm/components/config-server
+ln -s ../../../../config-repo config-repo
+```
 
 
 
