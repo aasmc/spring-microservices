@@ -265,12 +265,64 @@ docker-compose build
 The eval $(minikube docker-env) command directs the local Docker client to communicate
 with the Docker engine in Minikube.
 
+### Resolving Helm chart dependencies
 
+```bash
+for f in kubernetes/helm/components/*; do helm dep up $f; done
 
+for f in kubernetes/helm/environments/*; do helm dep up $f; done
 
+helm dep ls kubernetes/helm/environments/dev-env/
+```
 
+## Deploying to Kubernetes
 
+1. To avoid a slow Deployment process due to Kubernetes downloading Docker images (potentially causing the liveness probes we described previously to restart our Pods), run the following docker pull commands to download the images in advance:
+```bash
+eval $(minikube docker-env)
+docker pull mysql:8.0.32
+docker pull mongo:6.0.4
+docker pull rabbitmq:3.11.8-management
+docker pull openzipkin/zipkin:2.24.0
+```
 
+2. Before using the Helm charts, render the templates using the helm template command to see what the manifests will look like:
+```bash
+helm template kubernetes/helm/environments/dev-env
+```
+3. To also verify that the Kubernetes cluster will actually accept the rendered manifest, a dry run of the installation can be performed by passing –-dry-run to the helm install command. Passing the --debug flag will also show which user-supplied and calculated values Helm will use when rendering the manifests. Run the following command to perform a dry run:
+
+```bash
+helm install --dry-run --debug hands-on-dev-env \ kubernetes/helm/environments/dev-env
+```
+
+4. To initiate the Deployment of the complete system landscape, including creating the Name- space, hands-on, run the following command:
+```bash
+ helm install hands-on-dev-env \
+  kubernetes/helm/environments/dev-env \
+  -n hands-on \
+  --create-namespace
+```
+
+5. Set the newly created namespace as the default namespace for kubectl:
+```bash
+ 
+```
+
+6. To see the Pods starting up, run the command:
+```bash
+kubectl get pods --watch
+```
+
+7. Wait for all the Pods in the Namespace to be ready with the command:
+```bash
+kubectl wait --timeout=600s --for=condition=ready pod --all 
+```
+
+8. To see the Docker images that are used, run the following command:
+```bash
+kubectl get pods -o json | jq .items[].spec.containers[].image 
+```
 
 
 
